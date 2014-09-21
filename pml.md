@@ -1,0 +1,38 @@
+### PML - Writeup
+#### Summary of steps
+The basic steps in involved are:
+   * Loading the training set - pml-training.csv
+   * Cleaning up the dataset to remove the columns/predictors with near zero variance and where there are lot of missing values or NAs
+   * From the training set above, create a model training set and a cross-validation set in the ration of 70:30 percent.
+   * Using the model training set above, train a model using RandomForest
+   * Run varImp() on the generated model to checkout the significance of predictors
+   * Run resid() function on the model to checkout the residual error in the model. 
+   * Checkout the residual variables and diagnostics by ploting the model.
+   * Run the cross-validation set against the generated model to predict the model accuracy.
+   * Check the predictions from this cross-validated set using a confusion matrix.
+   * If the accuracy is > 0.9; run the real test set from pml-testing.csv
+#### Implementation
+
+```r
+#df <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-training.csv")
+#explore <- describe(df)
+#removecols <- nearZeroVar(df)
+#nearzerodf <- df[,-removecols]
+#cleandf <- subset(nearzerodf, select=-c(X,user_name,raw_timestamp_part_1,raw_timestamp_part_2,cvtd_timestamp,var_accel_forearm,amplitude_pitch_forearm,min_pitch_forearm,max_picth_forearm,var_yaw_dumbbell,stddev_yaw_dumbbell,avg_yaw_dumbbell,var_pitch_dumbbell,stddev_pitch_dumbbell,avg_pitch_dumbbell,var_roll_dumbbell,stddev_roll_dumbbell,avg_roll_dumbbell,var_accel_dumbbell,amplitude_pitch_dumbbell,amplitude_roll_dumbbell,min_pitch_dumbbell,min_roll_dumbbell,max_picth_dumbbell,max_roll_dumbbell,max_roll_belt,max_picth_belt,min_roll_belt,min_pitch_belt,amplitude_roll_belt,amplitude_pitch_belt,var_total_accel_belt, avg_roll_belt,stddev_roll_belt, var_roll_belt,avg_pitch_belt, stddev_pitch_belt,var_pitch_belt,avg_yaw_belt,stddev_yaw_belt,var_yaw_belt,var_accel_arm,max_picth_arm,max_yaw_arm,min_yaw_arm,amplitude_yaw_arm))
+
+#traindf <- cleandf
+#select <- createDataPartition(traindf$classe, p = 0.7, list = FALSE)
+#modelTrain <- traindf[select,]
+#modelTest <- traindf[-select,]
+#model <- train(classe ~ ., data=modelTrain, method="rf", verbose=FALSE)
+```
+
+```r
+#predictions <- predict(model,modelTest)
+#confusionMatrix(predictions,modelTest$classe)
+
+#dftest <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-testing.csv")
+#cleanset <- dftest[,names(cleandf)]
+#realpredictions <- predict(model,cleanset$classe)
+#summary(realpredictions)
+```
