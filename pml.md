@@ -11,6 +11,25 @@ The basic steps in involved are:
    * Run the cross-validation set against the generated model to predict the model accuracy.
    * Check the predictions from this cross-validated set using a confusion matrix.
    * If the accuracy is > 0.9; run the real test set from pml-testing.csv
+   
+#### Confusion Matrix and Statistics
+<!-- html table generated in R 3.1.1 by xtable 1.7-4 package -->
+<!-- Mon Sep 22 00:48:54 2014 -->
+<table border=1>
+<tr> <th>  </th> <th> A </th> <th> B </th> <th> C </th> <th> D </th> <th> E </th>  </tr>
+  <tr> <td align="right"> A </td> <td align="right"> 1674 </td> <td align="right">   6 </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right">   0 </td> </tr>
+  <tr> <td align="right"> B </td> <td align="right">   0 </td> <td align="right"> 1133 </td> <td align="right">   4 </td> <td align="right">   0 </td> <td align="right">   0 </td> </tr>
+  <tr> <td align="right"> C </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right"> 1022 </td> <td align="right">   0 </td> <td align="right">   0 </td> </tr>
+  <tr> <td align="right"> D </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right"> 963 </td> <td align="right">   3 </td> </tr>
+  <tr> <td align="right"> E </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right">   0 </td> <td align="right">   1 </td> <td align="right"> 1079 </td> </tr>
+   </table>
+
+Overall Statistics
+                                         
+               Accuracy : 0.9976         
+                 95% CI : (0.996, 0.9987)
+    No Information Rate : 0.2845         
+    P-Value [Acc > NIR] : < 2.2e-16
 #### Implementation
 
 ```r
@@ -32,7 +51,8 @@ The basic steps in involved are:
 #confusionMatrix(predictions,modelTest$classe)
 
 #dftest <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-testing.csv")
-#cleanset <- dftest[,names(cleandf)]
-#realpredictions <- predict(model,cleanset$classe)
+#cleanset <- dftest[,names(cleandf)[1:53]]
+#clean <- cbind(cleanset,dftest$problem_id)
+#realpredictions <- predict(model,clean)
 #summary(realpredictions)
 ```
