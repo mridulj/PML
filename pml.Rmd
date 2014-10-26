@@ -1,14 +1,14 @@
 ### PML - Writeup
-#### Summary of steps
-The basic steps in involved are:
-   * Loading the training set - pml-training.csv
-   * Cleaning up the dataset to remove the columns/predictors with near zero variance and where there are lot of missing values or NAs. near zero variance predictors take unique values across samples, are non-informative as well as break the model.
-   * From the training set above, create a model training set and a cross-validation set in the ratio of 70:30 percent.
-   * Using the model training set above, train a model using RandomForest
-   * Run varImp() on the generated model to checkout the significance of predictors
-   * Run the cross-validation set against the generated model to predict the model accuracy.
-   * Check the predictions from this cross-validated set using a confusion matrix.
-   * If the accuracy is > 0.9; run the real test set from pml-testing.csv
+#### Summary of steps 
+The basic steps in involved are given below. Implementation section shows each of these steps as comments.
+   1. Loading the training set - pml-training.csv
+   2. Cleaning up the dataset to remove the columns/predictors with near zero variance and where there are lot of missing values or NAs. near zero variance predictors take unique values across samples, are non-informative as well as break the model.
+   3. From the training set above, create a model training set and a cross-validation set in the ratio of 70:30 percent.
+   4. Using the model training set above, train a model using RandomForest
+   5. Run varImp() on the generated model to checkout the significance of predictors
+   6. Run the cross-validation set against the generated model to predict the model accuracy.
+   7. Check the predictions from this cross-validated set using a confusion matrix.
+   8. If the accuracy is > 0.9; run the real test set from pml-testing.csv
 
 #### Expected out of sample error
 The out of sample or out of bag error for the model is 0.21% given by model$finalModel:
@@ -37,29 +37,44 @@ Overall Statistics
     No Information Rate : 0.2845         
     P-Value [Acc > NIR] : < 2.2e-16
     
-#### Implementation
-```{r model,echo=TRUE,cache=TRUE}
-#df <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-training.csv")
+#### Implementation 
+```{r model,echo=TRUE,cache=TRUE,results='hide'}
+##1. Loading the training set - pml-training.csv
+df <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-training.csv")
+##2. Cleaning up the dataset to remove the columns/predictors with near zero variance and where there are lot of missing values or NAs. near zero variance predictors take unique values across samples, are non-informative as well as break the model.
 #explore <- describe(df)
-#library(caret)
-#removecols <- nearZeroVar(df)
-#nearzerodf <- df[,-removecols]
-#cleandf <- subset(nearzerodf, select=-c(X,user_name,raw_timestamp_part_1,raw_timestamp_part_2,cvtd_timestamp,var_accel_forearm,amplitude_pitch_forearm,min_pitch_forearm,max_picth_forearm,var_yaw_dumbbell,stddev_yaw_dumbbell,avg_yaw_dumbbell,var_pitch_dumbbell,stddev_pitch_dumbbell,avg_pitch_dumbbell,var_roll_dumbbell,stddev_roll_dumbbell,avg_roll_dumbbell,var_accel_dumbbell,amplitude_pitch_dumbbell,amplitude_roll_dumbbell,min_pitch_dumbbell,min_roll_dumbbell,max_picth_dumbbell,max_roll_dumbbell,max_roll_belt,max_picth_belt,min_roll_belt,min_pitch_belt,amplitude_roll_belt,amplitude_pitch_belt,var_total_accel_belt, avg_roll_belt,stddev_roll_belt, var_roll_belt,avg_pitch_belt, stddev_pitch_belt,var_pitch_belt,avg_yaw_belt,stddev_yaw_belt,var_yaw_belt,var_accel_arm,max_picth_arm,max_yaw_arm,min_yaw_arm,amplitude_yaw_arm))
+library(caret)
+removecols <- nearZeroVar(df)
+nearzerodf <- df[,-removecols]
+cleandf <- subset(nearzerodf, select=-c(X,user_name,raw_timestamp_part_1,raw_timestamp_part_2,cvtd_timestamp,var_accel_forearm,amplitude_pitch_forearm,min_pitch_forearm,max_picth_forearm,var_yaw_dumbbell,stddev_yaw_dumbbell,avg_yaw_dumbbell,var_pitch_dumbbell,stddev_pitch_dumbbell,avg_pitch_dumbbell,var_roll_dumbbell,stddev_roll_dumbbell,avg_roll_dumbbell,var_accel_dumbbell,amplitude_pitch_dumbbell,amplitude_roll_dumbbell,min_pitch_dumbbell,min_roll_dumbbell,max_picth_dumbbell,max_roll_dumbbell,max_roll_belt,max_picth_belt,min_roll_belt,min_pitch_belt,amplitude_roll_belt,amplitude_pitch_belt,var_total_accel_belt, avg_roll_belt,stddev_roll_belt, var_roll_belt,avg_pitch_belt, stddev_pitch_belt,var_pitch_belt,avg_yaw_belt,stddev_yaw_belt,var_yaw_belt,var_accel_arm,max_picth_arm,max_yaw_arm,min_yaw_arm,amplitude_yaw_arm))
 
-#traindf <- cleandf
-#select <- createDataPartition(traindf$classe, p = 0.7, list = FALSE)
-#modelTrain <- traindf[select,]
-#modelTest <- traindf[-select,]
-#model <- train(classe ~ ., data=modelTrain, method="rf", verbose=FALSE)
+traindf <- cleandf
+#3. From the training set above, create a model training set and a cross-validation set in the ratio of 70:30 percent.
+select <- createDataPartition(traindf$classe, p = 0.7, list = FALSE)
+dataTrain <- traindf[select,]
+dataCV <- traindf[-select,]
+#4. Using the model training set above, train a model using RandomForest
+model <- train(classe ~ ., data=dataTrain, method="rf", verbose=FALSE)
+summary(model)
 ```
-```{r predictions,echo=TRUE}
-#predictions <- predict(model,modelTest)
-#confusionMatrix(predictions,modelTest$classe)
+```{r predictions,echo=TRUE,results='hide'}
+#5. Run varImp() on the generated model to checkout the significance of predictors
+sign_pred <- varImp(model)
+#6. Run the cross-validation set against the generated model to predict the model accuracy.
+predictions <- predict(model,dataCV)
+#7. Check the predictions from this cross-validated set using a confusion matrix.Results analyzed in the section above (Confusion Matrix and Statistics on cross-validation data)
+confusionMatrix(predictions,dataCV$classe)
+# Additionally, you can use the cross validation to check the model
+cv <- trainControl(method = "repeatedcv", repeats = 1, number=4, allowParallel=TRUE, verboseIter=TRUE) 
+preObj <- c("center", "scale") 
+modFit_rf <- train(classe~., data=dataTrain, preProcess=preObj, method = 'rf', trControl =cv) 
+summary(modFit_rf)
 
-#dftest <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-testing.csv")
-#cleanset <- dftest[,names(cleandf)[1:53]]
-#clean <- cbind(cleanset,dftest$problem_id)
-#Do not show the answer for pml-testing.csv. So comment out the following; though it works with 100% accuracy on pml-testing.csv
-##realpredictions <- predict(model,clean)
-##summary(realpredictions)
+#8. If the accuracy is > 0.9(which has been analyzed in section "Expected out of sample error"); run the real test set from pml-testing.csv
+dataTest <- read.csv("/Users/mridul/coursera/PREDMACHLEARN/pml-testing.csv")
+cleanset <- dataTest[,names(cleandf)[1:53]]
+clean <- cbind(cleanset,dataTest$problem_id)
+#Do not show the answer for pml-testing.csv. It works though, with 100% accuracy on pml-testing.csv
+realpredictions <- predict(model,clean)
+summary(realpredictions)
 ```
